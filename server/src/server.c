@@ -56,7 +56,7 @@ int division(int a, int b) {
 SOCKET accept_client(int socket_server, SOCKET socket_client, int len_client) {
 	socket_client = accept(socket_server, (struct sockaddr*) &cad, &len_client);
 	if (socket_client == INVALID_SOCKET) {
-		wprintf(L"L'accettazione e' fallita con errore : %ld\n",
+		wprintf(L"The acceptance falied with an error: %ld\n",
 				WSAGetLastError());
 		closesocket(socket_server);  // CHIUDUSRA DELLA CONNESSIONE
 		clearwinsock();
@@ -69,6 +69,48 @@ SOCKET accept_client(int socket_server, SOCKET socket_client, int len_client) {
 	}
 }
 
+msgStruct receive_message(SOCKET socket_client, msgStruct message) {
+	int iResult = recv(socket_client, (char*) (&message), sizeof(message), 0);
+	if (iResult > 0) {
+		switch (message.operation) {
+		case '+':
+			message.result = add(message.first_number, message.second_number);
+
+			break;
+		case '-':
+			message.result = sub(message.first_number, message.second_number);
+
+			break;
+		case '*':
+			message.result = mult(message.first_number, message.second_number);
+
+			break;
+		case '/':
+			message.result = division(message.first_number,
+					message.second_number);
+
+			break;
+		}
+	} else if (iResult == 0)
+		closesocket(socket_client);
+	else
+		printf("recv failed: %d\n", WSAGetLastError());
+	return message;
+}
+
+void send_message(int socket_client, msgStruct message) {
+	int iResult = send(socket_client, (char*) &message, sizeof(message), 0);
+	if (iResult == SOCKET_ERROR) {
+		wprintf(L"send message falied with error: %d\n", WSAGetLastError());
+		iResult = closesocket(socket_client);
+		if (iResult == SOCKET_ERROR)
+			wprintf(L"close function falied, with error: %ld\n",
+					WSAGetLastError());
+		clearwinsock();
+		exit(1);
+	}
+}
+
 int main(int argc, char *argv[]) {
 
 	///***********************
@@ -78,7 +120,7 @@ int main(int argc, char *argv[]) {
 	int iResult = 0; /// VARIABLE USED TO CHECK THE RETURN VALUES OF THE FUNCTIONS
 	int socket_server; /// CONTAINS THE NETWORK SOCKET DESCRIPTOR
 	SOCKET socket_client; /// CREATION OF A SOCKET TO ACCEPT INCOMING REQUESTS
-
+	msgStruct message;
 	sad.sin_family = AF_INET;
 	sad.sin_addr.s_addr = inet_addr(ADDRESS_CLIENT_SERVER);
 	sad.sin_port = htons(PORT_WELCOME_SERVER);
@@ -119,15 +161,27 @@ int main(int argc, char *argv[]) {
 		clearwinsock();
 		return 1;
 	}
-	for (;;) {
-		accept_client(socket_server, socket_client, sizeof(cad));
-	}
 
+	for (;;) {
+		socket_client = accept_client(socket_server, socket_client,
+				sizeof(cad));
+		for (;;) {
+			message = receive_message(socket_client, message);
+			if (message.operation == '=') {
+				break;
+			}
+			send_message(socket_client, message);
+
+		}
+
+	}
 	///***********************
 	/// CLOSE CONNECTION
 	///***********************
 
-	closesocket(socket_server); // close socket connection
+	iResult = closesocket(socket_server);
+	if (iResult == SOCKET_ERROR)
+		wprintf(L"close function falied, with error: %ld\n", WSAGetLastError());
 	clearwinsock();
 	return 0;
 } // main end

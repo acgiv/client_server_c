@@ -10,8 +10,14 @@ struct sockaddr_in cad; /// INIZIALIZATION OF THE STRUCT WHICH WILL CONTAIN THE 
 
 ///INIZIALIZE THE STRUCT TO PASS THE OPERATION, NUMBER AND RESULT BETWEEN THE CLIENT AND SERVER
 
-#define stuct msgStruct{ char operation int first_number int secondo_numero int result}
+typedef struct  {
+	char operation;
+	long first_number;
+	long second_number;
+	double result;
+} msgStruct;
 
 #define NO_ERROR 0 /// INIZIALIZE VARIABLE TO CHECK FOR ERROR
 
 #define QLEN 5 /// MAX NUMBER OF CLIENTS THAT CAN REAMIN CONNECTED WITCH THE SERVER AT THE SAME TIME
+
