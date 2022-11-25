@@ -22,18 +22,19 @@
 #endif
 #include <stdio.h>
 #include "header.h"
-
+#include <ctype.h>
 void clearwinsock() {
 #if defined WIN32
 	WSACleanup(); /// IT CANCELS THE IMPLEMENTATION OF WINDOWS SOCKET AND FREES THE RESOURCES ALLOCATED BY THE APPLICATION OR BY THE DDL FILE
 #endif
 }
 
+
 msgStruct user_data_entry(msgStruct message, int client) {
-	printf("Please enter the numbers and math operators in this format; 'operators first_number seconds_ numbers'. \n");
+	printf(
+			"Please enter the numbers and math operators in this format: 'operators first_number seconds_ numbers'. \n");
 	char c;
 	scanf("%c", &c);
-	printf("%c", c);
 	message.operation = c;
 	if (message.operation == '=') {
 		return message;
@@ -49,19 +50,19 @@ void send_message(int socket_client, msgStruct message) {
 		wprintf(L"send message falied with error: %d\n", WSAGetLastError());
 		iResult = closesocket(socket_client);
 		if (iResult == SOCKET_ERROR)
-			wprintf(L"something went wrong while closing the server, error code : %ld\n",
+			wprintf(
+					L"something went wrong while closing the server, error code : %ld\n",
 					WSAGetLastError());
 		clearwinsock();
 		exit(1);
 	}
 }
 
-
 boolean receive_message(SOCKET socket_client, msgStruct message) {
 	boolean result = FALSE;
 	int iResult = recv(socket_client, (char*) &message, sizeof(message), 0);
 	if (iResult > 0) {
-		printf("%.2lf\n", message.result);
+		printf("result operation = %.2f\n", message.result);
 	} else if (iResult == 0)
 		closesocket(socket_client);
 	else
@@ -97,7 +98,8 @@ int main(int argc, char *argv[]) {
 				WSAGetLastError());
 		iResult = closesocket(socket_client);
 		if (iResult == SOCKET_ERROR)
-			wprintf(L"something went wrong while closing the server, error code : %ld\n",
+			wprintf(
+					L"something went wrong while closing the server, error code : %ld\n",
 					WSAGetLastError());
 		clearwinsock();
 		return 1;

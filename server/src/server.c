@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #if defined WIN32
 #include <winsock.h>
 #else
@@ -37,20 +38,21 @@ void clearwinsock() {
 #endif
 }
 
-int add(int a, int b) {
+float add(int a, int b) {
 	return a + b;
 }
 
-int mult(int a, int b) {
+
+float mult(int a, int b) {
 	return a * b;
 }
 
-int sub(int a, int b) {
+float sub(int a, int b) {
 	return a - b;
 }
 
-int division(int a, int b) {
-	return a / b;
+float division(int a, int b) {
+	return(float) a /(float) b;
 }
 
 SOCKET accept_client(int socket_server, SOCKET socket_client, int len_client) {

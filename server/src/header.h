@@ -14,7 +14,7 @@ typedef struct  {
 	char operation;
 	long first_number;
 	long second_number;
-	double result;
+	float result;
 } msgStruct;
 
 #define NO_ERROR 0 /// INIZIALIZE VARIABLE TO CHECK FOR ERROR
